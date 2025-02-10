@@ -38,7 +38,6 @@ export const RegisterForm = () => {
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
         setError(e.response?.data.message);
-        console.log(e.response?.data.message);
         return null;
       }
 
@@ -64,7 +63,7 @@ export const RegisterForm = () => {
           Prašome prisijungti
         </Link>
       </p>
-      <div className="h-10">
+      <div className="h-10 mt-6">
         <p className="text-sm text-center text-rose-500">{error}</p>
       </div>
       {errors.first_name && (

@@ -10,4 +10,11 @@ export default class UserService {
   ): Promise<AxiosResponse<IUser>> {
     return $api.post(`${API_URL}/users`, { first_name, email, password });
   }
+
+  static userLogin(
+    email: string,
+    password: string
+  ): Promise<AxiosResponse<IUser>> {
+    return null;
+  }
 }

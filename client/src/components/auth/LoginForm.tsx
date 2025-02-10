@@ -4,9 +4,14 @@ import { LoginSchema } from "../../schemas/LoginSchema";
 import { Link } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FC, useState } from "react";
+import { useLoginMutation } from "../../store/users/authApiSlice";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "../../store/users/authSlice";
 
 export const LoginForm: FC = () => {
   const [error, setError] = useState("");
+  const [login, { isLoading }] = useLoginMutation();
+  const dispatch = useDispatch();
 
   const {
     register,
@@ -23,8 +28,18 @@ export const LoginForm: FC = () => {
   const onSubmit: SubmitHandler<z.infer<typeof LoginSchema>> = async (
     formData
   ) => {
-    console.log(formData);
-    setError("");
+    try {
+      const { email, password } = formData;
+      const userData = await login({ email, password }).unwrap();
+      console.log(userData);
+      dispatch(setCredentials({ ...userData }));
+    } catch (e: unknown) {
+      if (e.data.message)
+        if (e instanceof Error) {
+          setError(e.message);
+        }
+      console.log(e);
+    }
   };
 
   return (

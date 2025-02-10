@@ -9,7 +9,7 @@ const userRouter = require("./routers/user.router");
 // const orderRouter = require("./routers/order.router");
 
 // klaidos
-//const errorsMiddleware = require("./middlewares/error.middleware");
+const errorsMiddleware = require("./middlewares/error.middleware");
 
 const app = express();
 
@@ -31,6 +31,6 @@ app.use("/api/v1/users", userRouter);
 //app.use("/api/v1/orders", orderRouter);
 
 // sitoj eilej klaidos turi buti paskutines
-//app.use(errorsMiddleware);
+app.use(errorsMiddleware);
 
 module.exports = app;

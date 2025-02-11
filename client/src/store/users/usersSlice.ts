@@ -1,58 +1,81 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { IUser } from "../../types/user";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { IAuthResponse, IUser } from "../../types/user";
+import { RootState } from "../store";
+import $api from "../../api";
+import axios from "axios";
 
 //const token = localStorage.getItem("resToken");
 
-const userData: IUser = {
-  id: "0",
-  first_name: "",
-  email: "",
-  role: "",
-  address: "",
-  phone_number: "",
+interface IUserData {
+  user: IUser | undefined;
+  isAuth: boolean;
+  status: string;
+  error: string | undefined;
+}
+
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+const initialState: IUserData = {
+  user: undefined,
+  isAuth: false,
+  status: "idle", // `idle` || `failed` || `pending` || `succeeded`
+  error: undefined,
 };
 
-// if (token) {
-//   userData = jwtDecode(token);
-// }
+export const userLogin = createAsyncThunk<IAuthResponse, LoginCredentials>(
+  "user/userLogin",
+  async ({ email, password }, { rejectWithValue }) => {
+    try {
+      const response = await $api.post<IAuthResponse>("/users/login", {
+        email,
+        password,
+      });
 
-const initialState = {
-  id: userData.id,
-  first_name: userData.first_name,
-  email: userData.email,
-  role: userData.role,
-  address: userData.address,
-  phone_number: userData.phone_number,
-};
+      return response.data;
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) return rejectWithValue(e.response?.data);
+      if (e instanceof Error) return rejectWithValue(e.message);
+      return rejectWithValue(e);
+    }
+  }
+);
 
 export const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    login: (state, action) => {
-      state.id = action.payload.id;
-      state.first_name = action.payload.first_name;
-      state.email = action.payload.email;
-      state.role = action.payload.role;
-      state.address = action.payload.address;
-      state.phone_number = action.payload.phone_number;
+    setUser: (state, action) => {
+      state.user = { ...action.payload };
     },
-    update: (state, action) => {
-      state.first_name = action.payload.first_name;
-      state.address = action.payload.address;
-      state.phone_number = action.payload.phone_number;
+    setAuth: (state, action) => {
+      state.isAuth = action.payload;
     },
-    logout: (state) => {
-      state.id = "0";
-      state.first_name = "";
-      state.email = "";
-      state.role = "";
-      state.address = "";
-      state.phone_number = "";
-    },
+  },
+  extraReducers(builder) {
+    builder
+      .addCase(userLogin.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(userLogin.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.user = action.payload.user;
+        state.isAuth = true;
+        localStorage.setItem("petToken", action.payload.accessToken);
+      })
+      .addCase(userLogin.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload.message as string;
+      });
   },
 });
 
-export const { login, logout, update } = userSlice.actions;
+export const { setUser, setAuth } = userSlice.actions;
+
+export const selectUser = (state: RootState) => state.user.user;
+export const getUserStatus = (state: RootState) => state.user.status;
+export const getUserError = (state: RootState) => state.user.error;
 
 export default userSlice.reducer;

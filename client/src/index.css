@@ -19,3 +19,17 @@
   }
   /* h1, h2 ir taip toliau */
 }
+
+@layer components {
+  .shadow-text {
+    @apply [text-shadow:1px_1px_2px_var(--tw-shadow-color)] shadow-slate-800;
+  }
+
+  .form-input {
+    @apply w-full rounded-lg py-1 px-3 focus:outline-none;
+  }
+
+  .btn-generic {
+    @apply bg-violet-500 text-slate-50 rounded-lg p-2 hover:bg-violet-700 cursor-pointer;
+  }
+}

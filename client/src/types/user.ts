@@ -6,3 +6,9 @@ export interface IUser {
   address: string;
   phone_number: string;
 }
+
+export interface IAuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: IUser;
+}

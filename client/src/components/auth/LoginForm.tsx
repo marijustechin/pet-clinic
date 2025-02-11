@@ -1,17 +1,29 @@
 import * as z from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { LoginSchema } from "../../schemas/LoginSchema";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FC, useState } from "react";
-import { useLoginMutation } from "../../store/users/authApiSlice";
-import { useDispatch } from "react-redux";
-import { setCredentials } from "../../store/users/authSlice";
+import { useSelector } from "react-redux";
+import {
+  getUserError,
+  getUserStatus,
+  selectUser,
+  userLogin,
+} from "../../store/users/usersSlice";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { useEffect } from "react";
 
-export const LoginForm: FC = () => {
-  const [error, setError] = useState("");
-  const [login, { isLoading }] = useLoginMutation();
-  const dispatch = useDispatch();
+export const LoginForm = () => {
+  const user = useAppSelector(selectUser);
+  const dispatch = useAppDispatch();
+  const userStatus = useSelector(getUserStatus);
+  const userError = useSelector(getUserError);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) navigate("/");
+  }, [user, navigate]);
 
   const {
     register,
@@ -28,17 +40,9 @@ export const LoginForm: FC = () => {
   const onSubmit: SubmitHandler<z.infer<typeof LoginSchema>> = async (
     formData
   ) => {
-    try {
-      const { email, password } = formData;
-      const userData = await login({ email, password }).unwrap();
-      console.log(userData);
-      dispatch(setCredentials({ ...userData }));
-    } catch (e: unknown) {
-      if (e.data.message)
-        if (e instanceof Error) {
-          setError(e.message);
-        }
-      console.log(e);
+    const { email, password } = formData;
+    if (userStatus === "idle") {
+      dispatch(userLogin({ email, password }));
     }
   };
 
@@ -59,7 +63,7 @@ export const LoginForm: FC = () => {
         </Link>
       </p>
       <div className="h-10">
-        <p className="text-sm text-center text-rose-500">{error}</p>
+        <p className="text-sm text-center text-rose-500">{userError}</p>
       </div>
       {errors.email && (
         <span className="text-xs text-rose-500">{errors.email.message}</span>

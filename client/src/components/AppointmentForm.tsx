@@ -52,6 +52,11 @@ export const AppointmentForm = () => {
           />
         </div>
       </div>
+      <div className="flex justify-end">
+        <button className="btn-generic my-3" type="submit">
+          Užregistruoti
+        </button>
+      </div>
     </form>
   );
 };

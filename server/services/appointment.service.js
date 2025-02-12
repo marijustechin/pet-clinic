@@ -1,6 +1,6 @@
-const sequelize = require("../db");
+const sequelize = require('../db');
 const { appointment } = sequelize.models;
-const appointmentDto = require("../dtos/appointment.dto");
+const appointmentDto = require('../dtos/appointment.dto');
 
 class AppointmentService {
   async newAppointment(pet_name, date, time, notes, user_id) {
@@ -15,6 +15,19 @@ class AppointmentService {
     const appointmentData = new appointmentDto(appointmentNew);
 
     return appointmentData;
+  }
+
+  async getAllAppointments() {
+    const appointments = await appointment.findAll();
+
+    let appointmentsData = [];
+
+    for (const singleAppointment of appointments) {
+      const appointmentData = new appointmentDto(singleAppointment);
+      appointmentsData.push(appointmentData);
+    }
+
+    return appointmentsData;
   }
 
   async getUserAppointments(user_id) {

@@ -1,10 +1,10 @@
-@import url("https://fonts.googleapis.com/css2?family=Andika:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Andika:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @layer base {
   :root {
-    font-family: "Andika", serif;
+    font-family: 'Andika', serif;
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: normal;
@@ -17,8 +17,10 @@
   h2 {
     @apply text-2xl font-semibold mt-4 mb-2 text-violet-800;
   }
-  /* h1, h2 ir taip toliau */
 
+  h3 {
+    @apply text-xl font-semibold my-6 text-violet-800 text-center;
+  }
   main {
     @apply max-w-6xl mx-auto px-1 md:px-2 lg:px-3;
   }

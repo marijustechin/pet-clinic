@@ -1,9 +1,10 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { IAuthResponse, IUser } from "../../types/user";
-import { RootState } from "../store";
-import $api from "../../api";
-import axios from "axios";
-import { jwtDecode } from "jwt-decode";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { IAuthResponse, IUser } from '../../types/user';
+import { RootState } from '../store';
+import $api from '../../api';
+import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import HelperService from '../../services/HelperService';
 
 interface IUserData {
   user: IUser | undefined;
@@ -20,11 +21,11 @@ interface LoginCredentials {
 const initialState: IUserData = {
   user: undefined,
   isAuth: false,
-  status: "idle", // `idle` || `failed` || `pending` || `succeeded`
+  status: 'idle', // `idle` || `failed` || `pending` || `succeeded`
   error: undefined,
 };
 
-const token = localStorage.getItem("petToken");
+const token = localStorage.getItem('petToken');
 
 if (token) {
   const decoded: IUser = jwtDecode(token);
@@ -40,28 +41,26 @@ if (token) {
 }
 
 export const userLogin = createAsyncThunk<IAuthResponse, LoginCredentials>(
-  "user/userLogin",
+  'user/userLogin',
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await $api.post<IAuthResponse>("/users/login", {
+      const response = await $api.post<IAuthResponse>('/users/login', {
         email,
         password,
       });
 
       return response.data;
     } catch (e: unknown) {
-      if (axios.isAxiosError(e)) return rejectWithValue(e.response?.data);
-      if (e instanceof Error) return rejectWithValue(e.message);
-      return rejectWithValue(e);
+      return rejectWithValue(HelperService.errorToString(e));
     }
   }
 );
 
 export const userLogout = createAsyncThunk<IAuthResponse>(
-  "user/userLogout",
+  'user/userLogout',
   async () => {
     try {
-      const response = await $api.post<IAuthResponse>("/users/logout");
+      const response = await $api.post<IAuthResponse>('/users/logout');
 
       return response.data;
     } catch (e: unknown) {
@@ -72,7 +71,7 @@ export const userLogout = createAsyncThunk<IAuthResponse>(
 );
 
 export const userSlice = createSlice({
-  name: "user",
+  name: 'user',
   initialState,
   reducers: {
     setUser: (state, action) => {
@@ -81,39 +80,43 @@ export const userSlice = createSlice({
     setAuth: (state, action) => {
       state.isAuth = action.payload;
     },
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
   },
   extraReducers(builder) {
     builder
       .addCase(userLogin.pending, (state) => {
-        state.status = "loading";
+        state.status = 'loading';
       })
       .addCase(userLogin.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.status = 'succeeded';
+        state.error = undefined;
         state.user = action.payload.user;
         state.isAuth = true;
-        localStorage.setItem("petToken", action.payload.accessToken);
+        localStorage.setItem('petToken', action.payload.accessToken);
       })
       .addCase(userLogin.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload.message as string;
+        state.status = 'failed';
+        state.error = action.payload as string;
       })
       .addCase(userLogout.pending, (state) => {
-        state.status = "loading";
+        state.status = 'loading';
       })
       .addCase(userLogout.fulfilled, (state) => {
-        state.status = "idle";
+        state.status = 'idle';
         state.user = undefined;
         state.isAuth = false;
-        localStorage.removeItem("petToken");
+        localStorage.removeItem('petToken');
       })
       .addCase(userLogout.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload.message as string;
+        state.status = 'failed';
+        state.error = action.payload as string;
       });
   },
 });
 
-export const { setUser, setAuth } = userSlice.actions;
+export const { setUser, setAuth, setError } = userSlice.actions;
 
 export const selectUser = (state: RootState) => state.user.user;
 export const getUserStatus = (state: RootState) => state.user.status;

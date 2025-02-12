@@ -1,19 +1,19 @@
-import { SubmitHandler, useForm } from "react-hook-form";
-import * as z from "zod";
-import { RegisterSchema } from "../../schemas/RegisterSchema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router";
-import { useState } from "react";
-import axios from "axios";
-import UserService from "../../services/UserService";
-import toast from "react-hot-toast";
+import { SubmitHandler, useForm } from 'react-hook-form';
+import * as z from 'zod';
+import { RegisterSchema } from '../../schemas/RegisterSchema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useNavigate } from 'react-router';
+import { useState } from 'react';
+import axios from 'axios';
+import UserService from '../../services/UserService';
+import toast from 'react-hot-toast';
 
 interface RegisterFormProps {
   onClose: () => void;
 }
 
 export const RegisterForm = ({ onClose }: RegisterFormProps) => {
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const {
@@ -23,9 +23,9 @@ export const RegisterForm = ({ onClose }: RegisterFormProps) => {
   } = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
-      first_name: "",
-      email: "",
-      password: "",
+      first_name: '',
+      email: '',
+      password: '',
     },
   });
 
@@ -37,8 +37,8 @@ export const RegisterForm = ({ onClose }: RegisterFormProps) => {
 
       await UserService.userRegistration(first_name, email, password);
 
-      toast.success("Registracija sėkminga. Prašome prisijungti");
-      navigate("/");
+      toast.success('Registracija sėkminga. Prašome prisijungti');
+      onClose();
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
         setError(e.response?.data.message);
@@ -78,7 +78,7 @@ export const RegisterForm = ({ onClose }: RegisterFormProps) => {
       <fieldset className="border border-violet-300 px-1 rounded-lg flex flex-col gap-2">
         <legend
           className={`${
-            errors.first_name ? "text-rose-500" : "text-violet-600"
+            errors.first_name ? 'text-rose-500' : 'text-violet-600'
           } ml-4 p-1`}
         >
           Vardas
@@ -87,7 +87,7 @@ export const RegisterForm = ({ onClose }: RegisterFormProps) => {
           className="form-input focus:outline-none px-2 py-1"
           type="text"
           autoComplete="on"
-          {...register("first_name")}
+          {...register('first_name')}
         />
       </fieldset>
       {errors.email && (
@@ -96,7 +96,7 @@ export const RegisterForm = ({ onClose }: RegisterFormProps) => {
       <fieldset className="border border-violet-300 p-1 rounded-lg flex flex-col gap-2">
         <legend
           className={`${
-            errors.email ? "text-rose-500" : "text-violet-600"
+            errors.email ? 'text-rose-500' : 'text-violet-600'
           } ml-4 p-1`}
         >
           El. paštas
@@ -105,7 +105,7 @@ export const RegisterForm = ({ onClose }: RegisterFormProps) => {
           className="form-input focus:outline-none px-2 py-1"
           type="email"
           autoComplete="on"
-          {...register("email")}
+          {...register('email')}
         />
       </fieldset>
       {errors.password && (
@@ -114,7 +114,7 @@ export const RegisterForm = ({ onClose }: RegisterFormProps) => {
       <fieldset className="border border-violet-300 p-1 rounded-lg">
         <legend
           className={`${
-            errors.password ? "text-rose-500" : "text-violet-600"
+            errors.password ? 'text-rose-500' : 'text-violet-600'
           } ml-4 p-1`}
         >
           Slaptažodis
@@ -123,7 +123,7 @@ export const RegisterForm = ({ onClose }: RegisterFormProps) => {
           className="form-input focus:outline-none px-2 py-1"
           type="password"
           autoComplete="off"
-          {...register("password")}
+          {...register('password')}
         />
       </fieldset>
       <div className="flex flex-col gap-2 mt-2">

@@ -1,17 +1,18 @@
-import * as z from "zod";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { LoginSchema } from "../../schemas/LoginSchema";
-import { useNavigate } from "react-router";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useSelector } from "react-redux";
+import * as z from 'zod';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { LoginSchema } from '../../schemas/LoginSchema';
+import { useNavigate } from 'react-router';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useSelector } from 'react-redux';
 import {
   getUserError,
   getUserStatus,
   selectUser,
+  setError,
   userLogin,
-} from "../../store/users/usersSlice";
-import { useAppDispatch, useAppSelector } from "../../store/store";
-import { useEffect } from "react";
+} from '../../store/users/usersSlice';
+import { useAppDispatch, useAppSelector } from '../../store/store';
+import { useEffect } from 'react';
 
 interface LoginFormProps {
   onClose: () => void;
@@ -27,10 +28,10 @@ export const LoginForm = ({ onClose }: LoginFormProps) => {
 
   useEffect(() => {
     if (user) {
-      if (user.role === "ADMIN") {
-        navigate("/administratorius");
+      if (user.role === 'ADMIN') {
+        navigate('/administratorius');
       } else {
-        navigate("/naudotojo-profilis");
+        navigate('/naudotojo-profilis');
       }
     }
   }, [user, navigate]);
@@ -42,16 +43,20 @@ export const LoginForm = ({ onClose }: LoginFormProps) => {
   } = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
   });
+
+  const handleContinue = () => {
+    dispatch(setError(undefined));
+  };
 
   const onSubmit: SubmitHandler<z.infer<typeof LoginSchema>> = async (
     formData
   ) => {
     const { email, password } = formData;
-    if (userStatus === "idle") {
+    if (userStatus === 'idle' || userStatus === 'failed') {
       dispatch(userLogin({ email, password }));
     }
   };
@@ -72,7 +77,7 @@ export const LoginForm = ({ onClose }: LoginFormProps) => {
           Prašome užsiregistruoti
         </div>
       </div>
-      <div className="h-10">
+      <div className="h-10 my-3">
         <p className="text-sm text-center text-rose-500">{userError}</p>
       </div>
       {errors.email && (
@@ -81,7 +86,7 @@ export const LoginForm = ({ onClose }: LoginFormProps) => {
       <fieldset className="border border-violet-300 p-1 rounded-lg flex flex-col gap-2">
         <legend
           className={`${
-            errors.email ? "text-rose-500" : "text-violet-600"
+            errors.email ? 'text-rose-500' : 'text-violet-600'
           } ml-4 p-1`}
         >
           El. paštas
@@ -90,7 +95,8 @@ export const LoginForm = ({ onClose }: LoginFormProps) => {
           className="form-input focus:outline-none px-2 py-1"
           type="email"
           autoComplete="on"
-          {...register("email")}
+          onKeyUp={() => handleContinue()}
+          {...register('email')}
         />
       </fieldset>
       {errors.password && (
@@ -99,7 +105,7 @@ export const LoginForm = ({ onClose }: LoginFormProps) => {
       <fieldset className="border border-violet-300 p-1 rounded-lg">
         <legend
           className={`${
-            errors.password ? "text-rose-500" : "text-violet-600"
+            errors.password ? 'text-rose-500' : 'text-violet-600'
           } ml-4 p-1`}
         >
           Slaptažodis
@@ -108,7 +114,8 @@ export const LoginForm = ({ onClose }: LoginFormProps) => {
           className="form-input focus:outline-none px-2 py-1"
           type="password"
           autoComplete="off"
-          {...register("password")}
+          onKeyUp={() => handleContinue()}
+          {...register('password')}
         />
       </fieldset>
       <div className="flex flex-col gap-2 mt-2">

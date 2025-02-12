@@ -18,6 +18,10 @@
     @apply text-2xl font-semibold mt-4 mb-2 text-violet-800;
   }
   /* h1, h2 ir taip toliau */
+
+  main {
+    @apply max-w-6xl mx-auto px-1 md:px-2 lg:px-3;
+  }
 }
 
 @layer components {

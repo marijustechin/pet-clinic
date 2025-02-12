@@ -3,8 +3,7 @@ import { IAuthResponse, IUser } from "../../types/user";
 import { RootState } from "../store";
 import $api from "../../api";
 import axios from "axios";
-
-//const token = localStorage.getItem("resToken");
+import { jwtDecode } from "jwt-decode";
 
 interface IUserData {
   user: IUser | undefined;
@@ -25,6 +24,21 @@ const initialState: IUserData = {
   error: undefined,
 };
 
+const token = localStorage.getItem("petToken");
+
+if (token) {
+  const decoded: IUser = jwtDecode(token);
+  initialState.user = {
+    id: decoded.id,
+    first_name: decoded.first_name,
+    email: decoded.email,
+    address: decoded.address,
+    role: decoded.role,
+    phone_number: decoded.phone_number,
+  };
+  initialState.isAuth = true;
+}
+
 export const userLogin = createAsyncThunk<IAuthResponse, LoginCredentials>(
   "user/userLogin",
   async ({ email, password }, { rejectWithValue }) => {
@@ -39,6 +53,20 @@ export const userLogin = createAsyncThunk<IAuthResponse, LoginCredentials>(
       if (axios.isAxiosError(e)) return rejectWithValue(e.response?.data);
       if (e instanceof Error) return rejectWithValue(e.message);
       return rejectWithValue(e);
+    }
+  }
+);
+
+export const userLogout = createAsyncThunk<IAuthResponse>(
+  "user/userLogout",
+  async () => {
+    try {
+      const response = await $api.post<IAuthResponse>("/users/logout");
+
+      return response.data;
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) return e.response?.data;
+      if (e instanceof Error) return e.message;
     }
   }
 );
@@ -66,6 +94,19 @@ export const userSlice = createSlice({
         localStorage.setItem("petToken", action.payload.accessToken);
       })
       .addCase(userLogin.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload.message as string;
+      })
+      .addCase(userLogout.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(userLogout.fulfilled, (state) => {
+        state.status = "idle";
+        state.user = undefined;
+        state.isAuth = false;
+        localStorage.removeItem("petToken");
+      })
+      .addCase(userLogout.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload.message as string;
       });

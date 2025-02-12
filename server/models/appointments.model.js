@@ -3,7 +3,13 @@ const { DataTypes } = require("sequelize");
 module.exports = (sequelize) => {
   sequelize.define("appointment", {
     pet_name: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: "Gyvūno vardas privalomas",
+        },
+      },
     },
     date: {
       type: DataTypes.DATE,

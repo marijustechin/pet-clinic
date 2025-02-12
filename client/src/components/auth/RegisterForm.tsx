@@ -2,13 +2,17 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import * as z from "zod";
 import { RegisterSchema } from "../../schemas/RegisterSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { useState } from "react";
 import axios from "axios";
 import UserService from "../../services/UserService";
 import toast from "react-hot-toast";
 
-export const RegisterForm = () => {
+interface RegisterFormProps {
+  onClose: () => void;
+}
+
+export const RegisterForm = ({ onClose }: RegisterFormProps) => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -34,7 +38,7 @@ export const RegisterForm = () => {
       await UserService.userRegistration(first_name, email, password);
 
       toast.success("Registracija sėkminga. Prašome prisijungti");
-      navigate("/prisijungimas");
+      navigate("/");
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
         setError(e.response?.data.message);
@@ -54,15 +58,15 @@ export const RegisterForm = () => {
       className="max-w-sm mx-auto my-6"
     >
       <h2>Registracija</h2>
-      <p>
-        Ne pirmas kartas?{" "}
-        <Link
-          className="text-violet-700 underline underline-offset-8"
-          to={"/prisijungimas"}
+      <div className="flex gap-3">
+        <p>Ne pirmas kartas?</p>
+        <div
+          onClick={onClose}
+          className="text-violet-700 underline underline-offset-8 cursor-pointer"
         >
           Prašome prisijungti
-        </Link>
-      </p>
+        </div>
+      </div>
       <div className="h-10 mt-6">
         <p className="text-sm text-center text-rose-500">{error}</p>
       </div>

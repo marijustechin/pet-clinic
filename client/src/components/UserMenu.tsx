@@ -1,21 +1,18 @@
-import { useSelector } from "react-redux";
-import { selectUser } from "../store/users/usersSlice";
+import { selectUser, userLogout } from "../store/users/usersSlice";
 import { Link } from "react-router";
-import { FaRegUser } from "react-icons/fa";
 import { MdLogout } from "react-icons/md";
+import { useAppDispatch, useAppSelector } from "../store/store";
+import logo from "/logo.png";
 
 export const UserMenu = () => {
-  const user = useSelector(selectUser);
-
-  const handleLogout = () => {
-    console.log("Atsijungti...");
-  };
+  const user = useAppSelector(selectUser);
+  const dispatch = useAppDispatch();
 
   return (
     <div>
       {user ? (
         <div
-          onClick={handleLogout}
+          onClick={() => dispatch(userLogout())}
           className="flex gap-2 items-center text-violet-800 cursor-pointer"
         >
           <div>
@@ -26,16 +23,12 @@ export const UserMenu = () => {
           </div>
         </div>
       ) : (
-        <Link to={"/prisijungimas"}>
-          <div className="flex gap-2 items-center text-violet-800">
-            <div>
-              <FaRegUser size={28} />
-            </div>
-            <div className="flex flex-col items-center justify-center">
-              <p>Prisijungti</p>
-              <p>Užsiregistruoti</p>
-            </div>
-          </div>
+        <Link to={"/"}>
+          <img
+            className="h-16 transform -scale-x-100"
+            src={logo}
+            alt="logo image"
+          />
         </Link>
       )}
     </div>

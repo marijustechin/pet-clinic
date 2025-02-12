@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { LoginSchema } from "../../schemas/LoginSchema";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSelector } from "react-redux";
 import {
@@ -13,7 +13,11 @@ import {
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { useEffect } from "react";
 
-export const LoginForm = () => {
+interface LoginFormProps {
+  onClose: () => void;
+}
+
+export const LoginForm = ({ onClose }: LoginFormProps) => {
   const user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
   const userStatus = useSelector(getUserStatus);
@@ -22,7 +26,13 @@ export const LoginForm = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) navigate("/");
+    if (user) {
+      if (user.role === "ADMIN") {
+        navigate("/administratorius");
+      } else {
+        navigate("/naudotojo-profilis");
+      }
+    }
   }, [user, navigate]);
 
   const {
@@ -53,15 +63,15 @@ export const LoginForm = () => {
       onSubmit={handleSubmit(onSubmit)}
     >
       <h2>Prisijungimas</h2>
-      <p>
-        Pirmas kartas?{" "}
-        <Link
-          className="text-violet-700 underline underline-offset-8"
-          to={"/registracija"}
+      <div className="flex gap-3">
+        <p>Pirmas kartas?</p>
+        <div
+          onClick={onClose}
+          className="text-violet-700 underline underline-offset-8 cursor-pointer"
         >
           Prašome užsiregistruoti
-        </Link>
-      </p>
+        </div>
+      </div>
       <div className="h-10">
         <p className="text-sm text-center text-rose-500">{userError}</p>
       </div>

@@ -1,3 +1,5 @@
+import { useAppSelector } from "../store/store";
+import { selectUser } from "../store/users/usersSlice";
 import { IAppointment } from "../types/appointment";
 import { SingleAppointment } from "./SingleAppointment";
 
@@ -6,6 +8,8 @@ interface AppointmentListProps {
 }
 
 export const AppointmentList = ({ items }: AppointmentListProps) => {
+  const user = useAppSelector(selectUser);
+
   return (
     <div>
       {items &&
@@ -14,7 +18,7 @@ export const AppointmentList = ({ items }: AppointmentListProps) => {
             key={item.id}
             className="max-w-3xl mx-auto border-b border-violet-200 last:border-b-0 mb-2"
           >
-            <SingleAppointment item={item} />
+            {user && <SingleAppointment item={item} user={user} />}
           </div>
         ))}
     </div>

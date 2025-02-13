@@ -1,15 +1,15 @@
-import { FaMinus, FaPlus } from 'react-icons/fa';
-import { useAppDispatch, useAppSelector } from '../store/store';
-import { selectUser } from '../store/users/usersSlice';
-import { AppointmentForm } from '../components/AppointmentForm';
-import { AppointmentListFilter } from '../components/AppointmentListFilter';
-import { AppointmentList } from '../components/AppointmentList';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { FaMinus, FaPlus } from "react-icons/fa";
+import { useAppDispatch, useAppSelector } from "../store/store";
+import { selectUser } from "../store/users/usersSlice";
+import { AppointmentForm } from "../components/AppointmentForm";
+import { AppointmentListFilter } from "../components/AppointmentListFilter";
+import { AppointmentList } from "../components/AppointmentList";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import {
   getAppointmentsByUserId,
   selectAppointments,
-} from '../store/appointments/appointmentsSlice';
+} from "../store/appointments/appointmentsSlice";
 
 export const UserPage = () => {
   const dispatch = useAppDispatch();
@@ -20,15 +20,15 @@ export const UserPage = () => {
 
   useEffect(() => {
     if (!user) {
-      navigate('/');
-    } else if (user.role === 'ADMIN') {
-      navigate('/administratorius');
+      navigate("/");
+    } else if (user.role === "ADMIN") {
+      navigate("/administratorius");
     }
   }, [user, navigate]);
 
   useEffect(() => {
-    if (user){
-      dispatch(getAppointmentsByUserId({id: user.id}));
+    if (user) {
+      dispatch(getAppointmentsByUserId({ id: user.id }));
     }
   }, [dispatch, user]);
 
@@ -44,14 +44,13 @@ export const UserPage = () => {
         </div>
         {showForm && <AppointmentForm />}
       </div>
-      {appointments ? (
+      {appointments.length > 0 ? (
         <section>
-        <AppointmentListFilter />
-        <AppointmentList items={appointments} />
-      </section>
+          <AppointmentListFilter />
+          <AppointmentList items={appointments} />
+        </section>
       ) : (
         <h3>Paskirtų vizitų nėra</h3>
-        
       )}
     </main>
   );

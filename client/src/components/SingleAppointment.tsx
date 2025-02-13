@@ -32,7 +32,7 @@ export const SingleAppointment = ({ item, user }: SingleAppointmentProps) => {
   return (
     <div className="flex gap-3 justify-between">
       <div
-        onClick={() => handleDelete}
+        onClick={() => handleDelete()}
         className="w-8 h-8 border border-violet-300 rounded-md flex items-center justify-center cursor-pointer"
       >
         ❌
@@ -41,7 +41,7 @@ export const SingleAppointment = ({ item, user }: SingleAppointmentProps) => {
         <p className="text-violet-800 font-semibold text-lg">{item.pet_name}</p>
         <p>
           <span className="text-slate-400 font-semibold">Savininkas</span>:{" "}
-          {item.user.first_name}
+          {user.first_name}
         </p>
         <p>{item.notes ? item.notes : "-----"}</p>
       </div>

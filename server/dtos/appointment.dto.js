@@ -5,6 +5,7 @@ module.exports = class appointmentDto {
   time;
   notes;
   user_id;
+  user;
 
   constructor(model) {
     this.id = model.id;
@@ -13,5 +14,6 @@ module.exports = class appointmentDto {
     this.time = model.time;
     this.notes = model.notes;
     this.user_id = model.user_id;
+    this.user = model.user
   }
 };

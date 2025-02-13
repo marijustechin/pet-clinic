@@ -17,4 +17,7 @@ appointmentRouter.get('/', appointmentController.getAllAppointments);
 // vizitai pagal naudotojo id
 appointmentRouter.get('/:id', appointmentController.getUserAppointments);
 
+// istrinam vizita
+appointmentRouter.delete("/:id", appointmentController.deleteAppointment)
+
 module.exports = appointmentRouter;

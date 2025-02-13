@@ -45,6 +45,22 @@ class AppointmentController {
 
     res.status(200).json(userAppointments);
   }
+
+  async deleteAppointment(req, res, next){
+
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      console.log('Validation errors: ', errors.array());
+      return;
+    }
+
+    const { id } = req.params;
+
+    const deleted = appointmentService.deleteAppointment(id)
+
+    res.status(200).json(deleted)
+  }
 }
 
 module.exports = new AppointmentController();

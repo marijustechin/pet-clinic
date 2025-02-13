@@ -1,5 +1,5 @@
 const sequelize = require('../db');
-const { appointment } = sequelize.models;
+const { appointment, user } = sequelize.models;
 const appointmentDto = require('../dtos/appointment.dto');
 
 class AppointmentService {
@@ -18,7 +18,13 @@ class AppointmentService {
   }
 
   async getAllAppointments() {
-    const appointments = await appointment.findAll();
+    const appointments = await appointment.findAll({
+      include: {
+        model: user,
+        as: "user",
+        attributes: ["first_name"]
+      }
+    });
 
     let appointmentsData = [];
 
@@ -41,6 +47,12 @@ class AppointmentService {
     }
 
     return appointmentsData;
+  }
+
+  async deleteAppointment(id){
+    const deleted = await appointment.destroy({where: {id}})
+    
+    return deleted
   }
 }
 

@@ -1,16 +1,18 @@
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useAppSelector } from '../store/store';
+import { useAppDispatch, useAppSelector } from '../store/store';
 import { selectUser } from '../store/users/usersSlice';
 import { AppointmentSchema } from '../schemas/AppointmentSchema';
 import AppointmentService from '../services/AppointmentService';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
 import HelperService from '../services/HelperService';
+import { getAppointmentsByUserId } from '../store/appointments/appointmentsSlice';
 
 export const AppointmentForm = () => {
   const user = useAppSelector(selectUser);
+  const dispatch = useAppDispatch()
   const [error, setError] = useState<string>();
 
   const {
@@ -44,6 +46,7 @@ export const AppointmentForm = () => {
         );
         toast.success('Vizitas sėkmingai užregistruotas!');
         reset();
+        dispatch(getAppointmentsByUserId({id: user.id}))
       } catch (e: unknown) {
         setError(HelperService.errorToString(e));
       }

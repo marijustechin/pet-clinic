@@ -7,9 +7,7 @@ import { AppointmentList } from '../components/AppointmentList';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import {
-  getAppointments,
-  getAppointmentsError,
-  getAppointmentsStatus,
+  getAppointmentsByUserId,
   selectAppointments,
 } from '../store/appointments/appointmentsSlice';
 
@@ -17,8 +15,6 @@ export const UserPage = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   const appointments = useAppSelector(selectAppointments);
-  const appointmensStatus = useAppSelector(getAppointmentsStatus);
-  const appointmensError = useAppSelector(getAppointmentsError);
   const [showForm, setShowForm] = useState(false);
   const navigate = useNavigate();
 
@@ -31,11 +27,10 @@ export const UserPage = () => {
   }, [user, navigate]);
 
   useEffect(() => {
-    if (appointmensStatus === 'idle') {
-      dispatch(getAppointments({ id: '1' }));
-      console.log('kas cia blet?');
+    if (user){
+      dispatch(getAppointmentsByUserId({id: user.id}));
     }
-  }, [appointments, dispatch]);
+  }, [dispatch, user]);
 
   return (
     <main className="max-w-6xl mx-auto px-1 md:px-2 lg:px-3">
@@ -45,17 +40,18 @@ export const UserPage = () => {
           className="w-full bg-violet-300 rounded-t-lg p-3 flex gap-2 items-center justify-center text-violet-800 text-xl cursor-pointer"
         >
           {showForm ? <FaMinus /> : <FaPlus />}
-          <span className="font-semibold">Registruotis vizitui</span>
+          <span className="font-semibold">Registruoti vizitą</span>
         </div>
         {showForm && <AppointmentForm />}
       </div>
       {appointments ? (
-        <h3>Paskirtų vizitų nėra</h3>
-      ) : (
         <section>
-          <AppointmentListFilter />
-          <AppointmentList items={appointments} />
-        </section>
+        <AppointmentListFilter />
+        <AppointmentList items={appointments} />
+      </section>
+      ) : (
+        <h3>Paskirtų vizitų nėra</h3>
+        
       )}
     </main>
   );

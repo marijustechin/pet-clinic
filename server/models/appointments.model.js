@@ -1,13 +1,13 @@
-const { DataTypes } = require("sequelize");
+const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  sequelize.define("appointment", {
+  sequelize.define('appointment', {
     pet_name: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notNull: {
-          msg: "Gyvūno vardas privalomas",
+          msg: 'Gyvūno vardas privalomas',
         },
       },
     },
@@ -22,6 +22,15 @@ module.exports = (sequelize) => {
     notes: {
       type: DataTypes.TEXT,
       allowNull: true,
+    },
+    status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'Nepatvirtintas',
+    },
+    rating: {
+      type: DataTypes.SMALLINT,
+      defaultValue: 0,
     },
   });
 };

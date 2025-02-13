@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator');
 const appointmentService = require('../services/appointment.service');
+const ApiError = require('../exceptions/api.error');
 
 class AppointmentController {
   async newAppointment(req, res, next) {
@@ -46,8 +47,7 @@ class AppointmentController {
     res.status(200).json(userAppointments);
   }
 
-  async deleteAppointment(req, res, next){
-
+  async deleteAppointment(req, res, next) {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -57,9 +57,23 @@ class AppointmentController {
 
     const { id } = req.params;
 
-    const deleted = appointmentService.deleteAppointment(id)
+    const deleted = appointmentService.deleteAppointment(id);
 
-    res.status(200).json(deleted)
+    res.status(200).json(deleted);
+  }
+
+  async updateAppointment(req, res, next) {
+    const { id } = req.params;
+    const updates = req.body;
+
+    // jei body tuscias ir nera nei vieno lauko
+    if (!Object.keys(updates).length) {
+      throw ApiError.BadRequest('Nepateiktas nei vienas laukas');
+    }
+
+    const updated = await appointmentService.updateAppointment(id, updates);
+
+    return res.status(200).json(updated);
   }
 }
 

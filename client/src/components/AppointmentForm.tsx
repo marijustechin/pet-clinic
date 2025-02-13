@@ -8,11 +8,11 @@ import AppointmentService from '../services/AppointmentService';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
 import HelperService from '../services/HelperService';
-import { getAppointmentsByUserId } from '../store/appointments/appointmentsSlice';
+import { addAppointment } from '../store/appointments/appointmentsSlice';
 
 export const AppointmentForm = () => {
   const user = useAppSelector(selectUser);
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
   const [error, setError] = useState<string>();
 
   const {
@@ -37,16 +37,16 @@ export const AppointmentForm = () => {
       const { pet_name, date, time, notes } = formData;
       const user_id = user.id;
       try {
-        await AppointmentService.newAppointment(
+        const res = await AppointmentService.newAppointment(
           pet_name,
           date,
           time,
           notes,
           +user_id
         );
+        dispatch(addAppointment(res.data));
         toast.success('Vizitas sėkmingai užregistruotas!');
         reset();
-        dispatch(getAppointmentsByUserId({id: user.id}))
       } catch (e: unknown) {
         setError(HelperService.errorToString(e));
       }

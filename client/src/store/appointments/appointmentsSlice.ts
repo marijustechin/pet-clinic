@@ -1,8 +1,8 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { RootState } from "../store";
-import AppointmentService from "../../services/AppointmentService";
-import { IAppointment } from "../../types/appointment";
-import HelperService from "../../services/HelperService";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { RootState } from '../store';
+import AppointmentService from '../../services/AppointmentService';
+import { IAppointment } from '../../types/appointment';
+import HelperService from '../../services/HelperService';
 
 interface IUserId {
   id: string;
@@ -13,17 +13,25 @@ interface IInitState {
   status: string;
   error: string | undefined;
   query: string;
+  sort: {
+    opt1: string;
+    opt2: string;
+  };
 }
 
 const initialState: IInitState = {
   items: [],
-  status: "idle",
+  status: 'idle',
   error: undefined,
-  query: "",
+  query: '',
+  sort: {
+    opt1: 'date',
+    opt2: 'asc',
+  },
 };
 
 export const deleteAppointment = createAsyncThunk<string, IUserId>(
-  "appointments/deleteAppointment",
+  'appointments/deleteAppointment',
   async ({ id }, { rejectWithValue }) => {
     try {
       const res = await AppointmentService.deleteAppointment(id);
@@ -35,7 +43,7 @@ export const deleteAppointment = createAsyncThunk<string, IUserId>(
 );
 
 export const getAppointments = createAsyncThunk<IAppointment[]>(
-  "appointments/getAppointments",
+  'appointments/getAppointments',
   async (_, { rejectWithValue }) => {
     try {
       const res = await AppointmentService.getAllAppointments();
@@ -51,7 +59,7 @@ export const getAppointmentsByUserId = createAsyncThunk<
   IAppointment[],
   IUserId
 >(
-  "appointments/getAppointmentsByUserId",
+  'appointments/getAppointmentsByUserId',
   async ({ id }, { rejectWithValue }) => {
     try {
       const res = await AppointmentService.getUserAppointments(id);
@@ -64,37 +72,73 @@ export const getAppointmentsByUserId = createAsyncThunk<
 );
 
 export const appointmentSlice = createSlice({
-  name: "appointments",
+  name: 'appointments',
   initialState,
-  reducers: {},
+  reducers: {
+    addAppointment: (state, action) => {
+      state.items = [...state.items, action.payload];
+    },
+    sortAppointments: (state, action) => {
+      switch (action.payload) {
+        case 'date':
+          state.sort = { ...state.sort, opt1: action.payload };
+          // rikiuojam pagal data
+          if (state.sort.opt2 === 'asc') {
+            state.items.sort((a, b) => a.date.localeCompare(b.date));
+          } else {
+            state.items.sort((a, b) => b.date.localeCompare(a.date));
+          }
+          break;
+        case 'owner':
+          state.sort = { ...state.sort, opt1: action.payload };
+          // rikiuojam pagal savininka
+          if (state.sort.opt2 === 'asc') {
+            state.items.sort((a, b) =>
+              a.user.first_name.localeCompare(b.user.first_name)
+            );
+          } else {
+            state.items.sort((a, b) =>
+              b.user.first_name.localeCompare(a.user.first_name)
+            );
+          }
+          break;
+        case 'asc':
+          state.sort = { ...state.sort, opt2: action.payload };
+          break;
+        case 'desc':
+          state.sort = { ...state.sort, opt2: action.payload };
+          break;
+      }
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(getAppointmentsByUserId.pending, (state) => {
-        state.status = "loading";
+        state.status = 'loading';
       })
       .addCase(getAppointmentsByUserId.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.status = 'succeeded';
         state.items = [...action.payload];
       })
       .addCase(getAppointmentsByUserId.rejected, (state, action) => {
-        state.status = "failed";
+        state.status = 'failed';
         state.error = action.payload as string;
       })
       .addCase(getAppointments.pending, (state) => {
-        state.status = "loading";
+        state.status = 'loading';
       })
       .addCase(getAppointments.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.status = 'succeeded';
         state.items = [...action.payload];
       })
       .addCase(getAppointments.rejected, (state, action) => {
-        state.status = "failed";
+        state.status = 'failed';
         state.error = action.payload as string;
       });
   },
 });
 
-// export const { setUser, setAuth } = userSlice.actions;
+export const { addAppointment, sortAppointments } = appointmentSlice.actions;
 
 export const selectAppointments = (state: RootState) =>
   state.appointments.items;

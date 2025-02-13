@@ -7,5 +7,7 @@ export interface IAppointment {
   user_id: string;
   user: {
     first_name: string;
-  }
+  };
+  rating: number;
+  status: string;
 }

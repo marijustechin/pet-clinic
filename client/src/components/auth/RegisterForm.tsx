@@ -1,11 +1,10 @@
-import { SubmitHandler, useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { RegisterSchema } from '../../schemas/RegisterSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router';
+import { RegisterSchema } from '../../schemas/RegisterSchema';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { useState } from 'react';
-import axios from 'axios';
 import UserService from '../../services/UserService';
+import HelperService from '../../services/HelperService';
 import toast from 'react-hot-toast';
 
 interface RegisterFormProps {
@@ -14,7 +13,6 @@ interface RegisterFormProps {
 
 export const RegisterForm = ({ onClose }: RegisterFormProps) => {
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
   const {
     register,
@@ -40,14 +38,7 @@ export const RegisterForm = ({ onClose }: RegisterFormProps) => {
       toast.success('Registracija sėkminga. Prašome prisijungti');
       onClose();
     } catch (e: unknown) {
-      if (axios.isAxiosError(e)) {
-        setError(e.response?.data.message);
-        return null;
-      }
-
-      if (e instanceof Error) {
-        setError(e.message);
-      }
+      setError(HelperService.errorToString(e));
     }
   };
 

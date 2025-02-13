@@ -1,5 +1,5 @@
-import $api from "../api";
-import { IAppointment } from "../types/appointment";
+import $api from '../api';
+import { IAppointment } from '../types/appointment';
 
 export default class AppointmentService {
   static async newAppointment(
@@ -9,7 +9,7 @@ export default class AppointmentService {
     notes: string,
     user_id: number
   ) {
-    return await $api.post("/appointment", {
+    return await $api.post<IAppointment>('/appointment', {
       pet_name,
       date,
       time,
@@ -28,5 +28,12 @@ export default class AppointmentService {
 
   static async deleteAppointment(appointmentId: string) {
     return await $api.delete<string>(`/appointment/${appointmentId}`);
+  }
+
+  static async updateAppointment(
+    appointmentId: string,
+    updateData: { rating?: number; status?: string }
+  ) {
+    return await $api.patch(`/appointment/${appointmentId}`, updateData);
   }
 }

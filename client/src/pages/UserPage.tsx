@@ -10,6 +10,7 @@ import {
   getAppointmentsByUserId,
   selectAppointments,
 } from "../store/appointments/appointmentsSlice";
+import { Pagination } from "../components/Pagination";
 
 export const UserPage = () => {
   const dispatch = useAppDispatch();
@@ -48,6 +49,7 @@ export const UserPage = () => {
         <section>
           <AppointmentListFilter />
           <AppointmentList items={appointments} />
+          <Pagination />
         </section>
       ) : (
         <h3>Paskirtų vizitų nėra</h3>

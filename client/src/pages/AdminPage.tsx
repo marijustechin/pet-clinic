@@ -6,15 +6,14 @@ import { AppointmentListFilter } from "../components/AppointmentListFilter";
 import { AppointmentList } from "../components/AppointmentList";
 import {
   getAppointments,
-  getAppointmentsStatus,
   selectAppointments,
 } from "../store/appointments/appointmentsSlice";
+import { Pagination } from "../components/Pagination";
 
 export const AdminPage = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   const appointments = useAppSelector(selectAppointments);
-  const appointmentsStatus = useAppSelector(getAppointmentsStatus);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,10 +30,11 @@ export const AdminPage = () => {
 
   return (
     <main>
-      {appointmentsStatus === "succeeded" ? (
+      {appointments.length > 0 ? (
         <section>
           <AppointmentListFilter />
           <AppointmentList items={appointments} />
+          <Pagination />
         </section>
       ) : (
         <h3>Paskirtų viszitų nėra</h3>

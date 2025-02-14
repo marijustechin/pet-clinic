@@ -11,3 +11,8 @@ export interface IAppointment {
   rating: number;
   status: string;
 }
+
+export interface IAppointmentsPaginated {
+  items: IAppointment[];
+  total: number;
+}

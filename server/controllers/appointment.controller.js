@@ -1,13 +1,13 @@
-const { validationResult } = require('express-validator');
-const appointmentService = require('../services/appointment.service');
-const ApiError = require('../exceptions/api.error');
+const { validationResult } = require("express-validator");
+const appointmentService = require("../services/appointment.service");
+const ApiError = require("../exceptions/api.error");
 
 class AppointmentController {
   async newAppointment(req, res, next) {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-      console.log('Validation errors: ', errors.array());
+      console.log("Validation errors: ", errors.array());
       return;
     }
 
@@ -26,7 +26,11 @@ class AppointmentController {
 
   // visi vizitai
   async getAllAppointments(req, res, next) {
-    const allAppointments = await appointmentService.getAllAppointments();
+    const { page, per_page } = req.query;
+    const allAppointments = await appointmentService.getAllAppointments(
+      page,
+      per_page
+    );
 
     res.status(200).json(allAppointments);
   }
@@ -36,13 +40,18 @@ class AppointmentController {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-      console.log('Validation errors: ', errors.array());
+      console.log("Validation errors: ", errors.array());
       return;
     }
 
     const { id } = req.params;
+    const { page, per_page } = req.query;
 
-    const userAppointments = await appointmentService.getUserAppointments(id);
+    const userAppointments = await appointmentService.getUserAppointments(
+      id,
+      page,
+      per_page
+    );
 
     res.status(200).json(userAppointments);
   }
@@ -51,7 +60,7 @@ class AppointmentController {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-      console.log('Validation errors: ', errors.array());
+      console.log("Validation errors: ", errors.array());
       return;
     }
 
@@ -68,7 +77,7 @@ class AppointmentController {
 
     // jei body tuscias ir nera nei vieno lauko
     if (!Object.keys(updates).length) {
-      throw ApiError.BadRequest('Nepateiktas nei vienas laukas');
+      throw ApiError.BadRequest("Nepateiktas nei vienas laukas");
     }
 
     const updated = await appointmentService.updateAppointment(id, updates);

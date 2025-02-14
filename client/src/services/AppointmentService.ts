@@ -1,5 +1,5 @@
-import $api from '../api';
-import { IAppointment } from '../types/appointment';
+import $api from "../api";
+import { IAppointment, IAppointmentsPaginated } from "../types/appointment";
 
 export default class AppointmentService {
   static async newAppointment(
@@ -9,7 +9,7 @@ export default class AppointmentService {
     notes: string,
     user_id: number
   ) {
-    return await $api.post<IAppointment>('/appointment', {
+    return await $api.post<IAppointment>("/appointment", {
       pet_name,
       date,
       time,
@@ -18,12 +18,14 @@ export default class AppointmentService {
     });
   }
 
-  static async getUserAppointments(user_id: string) {
-    return await $api.get<IAppointment[]>(`/appointment/${user_id}`);
+  static async getUserAppointments(user_id: string, query: string) {
+    return await $api.get<IAppointmentsPaginated>(
+      `/appointment/${user_id + query}`
+    );
   }
 
-  static async getAllAppointments() {
-    return await $api.get<IAppointment[]>(`/appointment`);
+  static async getAllAppointments(query: string) {
+    return await $api.get<IAppointmentsPaginated>(`/appointment${query}`);
   }
 
   static async deleteAppointment(appointmentId: string) {

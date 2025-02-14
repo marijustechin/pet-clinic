@@ -1,7 +1,7 @@
-import { useAppSelector } from '../store/store';
-import { selectUser } from '../store/users/usersSlice';
-import { IAppointment } from '../types/appointment';
-import { SingleAppointment } from './SingleAppointment';
+import { useAppSelector } from "../store/store";
+import { selectUser } from "../store/users/usersSlice";
+import { IAppointment } from "../types/appointment";
+import { SingleAppointment } from "./SingleAppointment";
 
 interface AppointmentListProps {
   items: IAppointment[];

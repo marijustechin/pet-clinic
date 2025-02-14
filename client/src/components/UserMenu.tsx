@@ -20,6 +20,7 @@ export const UserMenu = () => {
           </div>
           <div className="flex flex-col items-center justify-center">
             <p>Atsijungti</p>
+            <p>{user.first_name}</p>
           </div>
         </div>
       ) : (

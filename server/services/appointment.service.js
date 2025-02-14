@@ -1,7 +1,7 @@
-const sequelize = require('../db');
+const sequelize = require("../db");
 const { appointment, user } = sequelize.models;
-const appointmentDto = require('../dtos/appointment.dto');
-const ApiError = require('../exceptions/api.error');
+const appointmentDto = require("../dtos/appointment.dto");
+const ApiError = require("../exceptions/api.error");
 
 class AppointmentService {
   async newAppointment(pet_name, date, time, notes, user_id) {
@@ -22,14 +22,17 @@ class AppointmentService {
     return appointmentData;
   }
 
-  async getAllAppointments() {
-    const appointments = await appointment.findAll({
+  async getAllAppointments(page = 1, per_page = 3) {
+    const result = await appointment.findAndCountAll({
       include: {
         model: user,
-        as: 'user',
-        attributes: ['first_name'],
+        as: "user",
+        attributes: ["first_name"],
       },
+      limit: per_page,
+      offset: (page - 1) * per_page,
     });
+    const appointments = result.rows;
 
     let appointmentsData = [];
 
@@ -38,18 +41,22 @@ class AppointmentService {
       appointmentsData.push(appointmentData);
     }
 
-    return appointmentsData;
+    return { items: appointmentsData, total: result.count };
   }
 
-  async getUserAppointments(user_id) {
-    const userAppointments = await appointment.findAll({
+  async getUserAppointments(user_id, page = 1, per_page = 3) {
+    const result = await appointment.findAndCountAll({
       where: { user_id },
       include: {
         model: user,
-        as: 'user',
-        attributes: ['first_name'],
+        as: "user",
+        attributes: ["first_name"],
       },
+      limit: per_page,
+      offset: (page - 1) * per_page,
     });
+
+    const userAppointments = result.rows;
 
     let appointmentsData = [];
 
@@ -58,7 +65,7 @@ class AppointmentService {
       appointmentsData.push(appointmentData);
     }
 
-    return appointmentsData;
+    return { items: appointmentsData, total: result.count };
   }
 
   async deleteAppointment(id) {
@@ -73,7 +80,7 @@ class AppointmentService {
     });
 
     if (!updated) {
-      throw ApiError.BadRequest('Tokių įrašų nepavyko rasti');
+      throw ApiError.BadRequest("Tokių įrašų nepavyko rasti");
     }
 
     return updated;

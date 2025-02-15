@@ -1,7 +1,7 @@
-const sequelize = require("../db");
+const sequelize = require('../db');
 const { appointment, user } = sequelize.models;
-const appointmentDto = require("../dtos/appointment.dto");
-const ApiError = require("../exceptions/api.error");
+const appointmentDto = require('../dtos/appointment.dto');
+const ApiError = require('../exceptions/api.error');
 
 class AppointmentService {
   async newAppointment(pet_name, date, time, notes, user_id) {
@@ -23,14 +23,19 @@ class AppointmentService {
   }
 
   async getAllAppointments(page = 1, per_page = 3) {
+    // su postgres nebutina,
+    // o su mariaDB/mysql sitie parametrai
+    // PRIVALO buti skaiciaus tipo, nes mes sintakses klaida
+    const pageInt = Number(page);
+    const per_pageInt = Number(per_page);
     const result = await appointment.findAndCountAll({
       include: {
         model: user,
-        as: "user",
-        attributes: ["first_name"],
+        as: 'user',
+        attributes: ['first_name'],
       },
-      limit: per_page,
-      offset: (page - 1) * per_page,
+      limit: per_pagee,
+      offset: (pageInt - 1) * per_pageInt,
     });
     const appointments = result.rows;
 
@@ -45,15 +50,20 @@ class AppointmentService {
   }
 
   async getUserAppointments(user_id, page = 1, per_page = 3) {
+    // su postgres nebutina,
+    // o su mariaDB/mysql sitie parametrai
+    // PRIVALO buti skaiciaus tipo, nes mes sintakses klaida
+    const pageInt = Number(page);
+    const per_pageInt = Number(per_page);
     const result = await appointment.findAndCountAll({
       where: { user_id },
       include: {
         model: user,
-        as: "user",
-        attributes: ["first_name"],
+        as: 'user',
+        attributes: ['first_name'],
       },
-      limit: per_page,
-      offset: (page - 1) * per_page,
+      limit: per_pageInt,
+      offset: (pageInt - 1) * per_pageInt,
     });
 
     const userAppointments = result.rows;
@@ -80,7 +90,7 @@ class AppointmentService {
     });
 
     if (!updated) {
-      throw ApiError.BadRequest("Tokių įrašų nepavyko rasti");
+      throw ApiError.BadRequest('Tokių įrašų nepavyko rasti');
     }
 
     return updated;

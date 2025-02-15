@@ -15,10 +15,6 @@ module.exports = (sequelize) => {
       type: DataTypes.DATE,
       allowNull: false,
     },
-    time: {
-      type: DataTypes.TIME,
-      allowNull: false,
-    },
     notes: {
       type: DataTypes.TEXT,
       allowNull: true,

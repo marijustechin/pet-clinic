@@ -1,18 +1,18 @@
-import axios from "axios";
+import axios from 'axios';
 
 const months = [
-  "Sau",
-  "Vas",
-  "Kov",
-  "Bal",
-  "Geg",
-  "Bir",
-  "Lie",
-  "Rug",
-  "Rgs",
-  "Spa",
-  "Lap",
-  "Gru",
+  'Sau',
+  'Vas',
+  'Kov',
+  'Bal',
+  'Geg',
+  'Bir',
+  'Lie',
+  'Rug',
+  'Rgs',
+  'Spa',
+  'Lap',
+  'Gru',
 ];
 
 export default class HelperService {
@@ -22,18 +22,16 @@ export default class HelperService {
     if (e instanceof Error) return e.message;
 
     console.log(e);
-    return "Nežinoma klaida";
+    return 'Nežinoma klaida';
   }
 
-  static datetimeToString(date: string, time: string): string {
-    const d = new Date(date);
-    const m = months[d.getMonth()];
-    return (
-      m +
-      "-" +
-      d.toLocaleDateString("lt-LT").substring(5, 7) +
-      " " +
-      time.substring(0, 5)
-    );
+  static datetimeToString(date: Date): string {
+    const dateTime = new Date(date).toLocaleDateString('lt-Lt', {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: false,
+    });
+
+    return dateTime;
   }
 }

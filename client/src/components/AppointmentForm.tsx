@@ -1,31 +1,37 @@
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import { selectUser } from '../store/users/usersSlice';
 import { AppointmentSchema } from '../schemas/AppointmentSchema';
 import AppointmentService from '../services/AppointmentService';
 import toast from 'react-hot-toast';
-import { useState } from 'react';
 import HelperService from '../services/HelperService';
 import { addAppointment } from '../store/appointments/appointmentsSlice';
+import { registerLocale } from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { lt } from 'date-fns/locale/lt';
+import DatePicker from 'react-datepicker';
+import { addMonths, setHours, setMinutes } from 'date-fns';
 
 export const AppointmentForm = () => {
+  registerLocale('lt', lt);
   const user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
-  const [error, setError] = useState<string>();
 
   const {
     register,
     handleSubmit,
+
+    control,
     reset,
+    setError,
     formState: { errors },
   } = useForm<z.infer<typeof AppointmentSchema>>({
     resolver: zodResolver(AppointmentSchema),
     defaultValues: {
       pet_name: '',
-      date: '',
-      time: '',
+      date: new Date(),
       notes: '',
     },
   });
@@ -34,13 +40,16 @@ export const AppointmentForm = () => {
     formData
   ) => {
     if (user) {
-      const { pet_name, date, time, notes } = formData;
+      const { pet_name, date, notes } = formData;
+      if (date === null) {
+        setError('date', { message: 'Datos parinkimo problema' });
+        return;
+      }
       const user_id = user.id;
       try {
         const res = await AppointmentService.newAppointment(
           pet_name,
           date,
-          time,
           notes,
           +user_id
         );
@@ -48,7 +57,7 @@ export const AppointmentForm = () => {
         toast.success('Vizitas sėkmingai užregistruotas!');
         reset();
       } catch (e: unknown) {
-        setError(HelperService.errorToString(e));
+        setError('root', { message: HelperService.errorToString(e) });
       }
     }
   };
@@ -56,7 +65,7 @@ export const AppointmentForm = () => {
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)} className="px-4">
       <div>
-        {error && <span>{error}</span>}
+        {errors.root && <span>{errors.root.message}</span>}
         <div className="grid grid-cols-12 gap-2 items-center my-2">
           <label className="col-span-3 text-right" htmlFor="pet_name">
             <span>Gyvūno vardas</span>
@@ -92,25 +101,28 @@ export const AppointmentForm = () => {
         </div>
         <div className="grid grid-cols-12 gap-2 items-center my-2">
           <label className="col-span-3 text-right" htmlFor="date">
-            Data
+            Data ir laikas
           </label>
           <div className="col-span-9 grid grid-cols-12 gap-2 items-center">
-            <input
-              id="date"
-              disabled={user ? false : true}
-              className="w-full col-span-4 border border-violet-300 rounded-lg px-2 py-1"
-              type="date"
-              {...register('date')}
-            />
-            <label htmlFor="time" className="col-span-4 text-right">
-              Laikas
-            </label>
-            <input
-              id="time"
-              disabled={user ? false : true}
-              className="w-full col-span-4 border border-violet-300 rounded-lg px-2 py-1"
-              type="time"
-              {...register('time')}
+            <Controller
+              control={control}
+              name="date"
+              render={({ field }) => (
+                <DatePicker
+                  locale={lt}
+                  selected={field.value}
+                  showTimeSelect
+                  onChange={(date) => field.onChange(date)}
+                  timeIntervals={30}
+                  timeCaption="Laikas"
+                  timeFormat="HH:mm"
+                  dateFormat="yyyy-MM-dd HH:mm"
+                  minDate={new Date()}
+                  maxDate={addMonths(new Date(), 3)}
+                  minTime={setHours(setMinutes(new Date(), 0), 10)}
+                  maxTime={setHours(setMinutes(new Date(), 0), 16)}
+                />
+              )}
             />
           </div>
         </div>
@@ -130,7 +142,7 @@ export const AppointmentForm = () => {
       <div className="grid grid-cols-12">
         <div className="col-span-10 text-sm text-rose-500">
           {errors.pet_name && <span>{errors.pet_name.message}</span>}
-          {errors.time && <span>{errors.time.message}</span>}
+          {errors.date && <span>{errors.date.message}</span>}
         </div>
         <div className="col-span-2">
           <button className="btn-generic my-3" type="submit">

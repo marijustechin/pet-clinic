@@ -34,7 +34,7 @@ class AppointmentService {
         as: 'user',
         attributes: ['first_name'],
       },
-      limit: per_pagee,
+      limit: per_pageInt,
       offset: (pageInt - 1) * per_pageInt,
     });
     const appointments = result.rows;

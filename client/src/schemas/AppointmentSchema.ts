@@ -1,12 +1,18 @@
-import * as z from "zod";
+import { addMonths } from 'date-fns';
+import * as z from 'zod';
 
 export const AppointmentSchema = z.object({
   pet_name: z
     .string()
     .trim()
-    .min(1, { message: "Pamiršote įvesti gyvūno vardą" }),
-  date: z.string().date().min(5, { message: "Pamiršote pasirinkti datą" }),
-  time: z.string().trim().min(5, { message: "Pamiršote pasirinkti laiką" }),
+    .min(1, { message: 'Pamiršote įvesti gyvūno vardą' }),
+  date: z
+    .date()
+    .min(new Date(), { message: 'Negalite parinkti vizito datos iš praeities' })
+    .max(addMonths(new Date(), 3), {
+      message: 'Negalite parinkti vėlesnės datos, nei 3 mėn. nuo šiandien',
+    })
+    .nullable(),
   //   pet_name: z
   //     .string()
   //     .trim()

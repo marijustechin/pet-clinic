@@ -1,18 +1,16 @@
-import $api from "../api";
-import { IAppointment, IAppointmentsPaginated } from "../types/appointment";
+import $api from '../api';
+import { IAppointment, IAppointmentsPaginated } from '../types/appointment';
 
 export default class AppointmentService {
   static async newAppointment(
     pet_name: string,
-    date: string,
-    time: string,
+    date: Date | null,
     notes: string,
     user_id: number
   ) {
-    return await $api.post<IAppointment>("/appointment", {
+    return await $api.post<IAppointment>('/appointment', {
       pet_name,
       date,
-      time,
       user_id,
       notes,
     });

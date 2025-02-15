@@ -1,14 +1,14 @@
-import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../store/store";
-import { selectUser } from "../store/users/usersSlice";
-import { useNavigate } from "react-router";
-import { AppointmentListFilter } from "../components/AppointmentListFilter";
-import { AppointmentList } from "../components/AppointmentList";
+import { useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from '../store/store';
+import { selectUser } from '../store/users/usersSlice';
+import { useNavigate } from 'react-router';
+import { AppointmentListFilter } from '../components/AppointmentListFilter';
+import { AppointmentList } from '../components/AppointmentList';
 import {
   getAppointments,
   selectAppointments,
-} from "../store/appointments/appointmentsSlice";
-import { Pagination } from "../components/Pagination";
+} from '../store/appointments/appointmentsSlice';
+import { Pagination } from '../components/Pagination';
 
 export const AdminPage = () => {
   const dispatch = useAppDispatch();
@@ -18,9 +18,9 @@ export const AdminPage = () => {
 
   useEffect(() => {
     if (!user) {
-      navigate("/");
-    } else if (user && user.role !== "ADMIN") {
-      navigate("/naudotojo-profilis");
+      navigate('/');
+    } else if (user && user.role !== 'ADMIN') {
+      navigate('/naudotojo-profilis');
     }
   }, [user, navigate]);
 

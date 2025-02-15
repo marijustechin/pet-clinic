@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import AppointmentService from '../services/AppointmentService';
 import HelperService from '../services/HelperService';
 import {
@@ -7,6 +8,7 @@ import {
 import { useAppDispatch } from '../store/store';
 import { IAppointment } from '../types/appointment';
 import { IUser } from '../types/user';
+import { ConfirmModal } from './ConfirmModal';
 import { RatingMain } from './rating/RatingMain';
 
 interface SingleAppointmentProps {
@@ -16,13 +18,19 @@ interface SingleAppointmentProps {
 
 export const SingleAppointment = ({ item, user }: SingleAppointmentProps) => {
   const dispatch = useAppDispatch();
+  const [confirm, setConfirm] = useState(false);
 
-  const handleDelete = async () => {
-    try {
-      await AppointmentService.deleteAppointment(item.id);
-      dispatch(removeAppointment(item.id));
-    } catch (e: unknown) {
-      console.log(HelperService.errorToString(e));
+  const handleDelete = async (yes: boolean) => {
+    if (yes) {
+      try {
+        await AppointmentService.deleteAppointment(item.id);
+        dispatch(removeAppointment(item.id));
+        setConfirm(false);
+      } catch (e: unknown) {
+        console.log(HelperService.errorToString(e));
+      }
+    } else {
+      setConfirm(false);
     }
   };
 
@@ -46,7 +54,7 @@ export const SingleAppointment = ({ item, user }: SingleAppointmentProps) => {
     <div className="flex gap-3 justify-between">
       <div className="flex flex-col gap-1">
         <div
-          onClick={() => handleDelete()}
+          onClick={() => setConfirm(true)}
           className="w-8 h-8 border border-violet-300 hover:bg-violet-200 rounded-md flex items-center justify-center cursor-pointer"
         >
           ❌
@@ -92,6 +100,13 @@ export const SingleAppointment = ({ item, user }: SingleAppointmentProps) => {
           />
         </div>
       </div>
+      <ConfirmModal
+        open={confirm}
+        onAnswer={(answer) => handleDelete(answer)}
+        prompt={`Ar tikrai norite ištrinti vizitą: ${
+          item.user.first_name
+        } : ${HelperService.datetimeToString(item.date)}?`}
+      />
     </div>
   );
 };

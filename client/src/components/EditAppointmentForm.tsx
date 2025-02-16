@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { AppointmentSchema } from '../schemas/AppointmentSchema';
 import { useAppDispatch, useAppSelector } from '../store/store';
-import { addAppointment } from '../store/appointments/appointmentsSlice';
+import { updateAppointment } from '../store/appointments/appointmentsSlice';
 import { selectUser } from '../store/users/usersSlice';
 import AppointmentService from '../services/AppointmentService';
 import toast from 'react-hot-toast';
@@ -13,8 +13,17 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { lt } from 'date-fns/locale/lt';
 import DatePicker from 'react-datepicker';
 import { addMonths, setHours, setMinutes } from 'date-fns';
+import { IAppointment } from '../types/appointment';
 
-export const AppointmentForm = () => {
+interface EditAppointmentFormProps {
+  item: IAppointment;
+  onClose: () => void;
+}
+
+export const EditAppointmentForm = ({
+  item,
+  onClose,
+}: EditAppointmentFormProps) => {
   registerLocale('lt', lt);
   const user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
@@ -30,35 +39,40 @@ export const AppointmentForm = () => {
   } = useForm<z.infer<typeof AppointmentSchema>>({
     resolver: zodResolver(AppointmentSchema),
     defaultValues: {
-      pet_name: '',
-      date: new Date(),
-      notes: '',
+      pet_name: item.pet_name,
+      date: item.date,
+      notes: item.notes,
     },
   });
 
   const onSubmit: SubmitHandler<z.infer<typeof AppointmentSchema>> = async (
     formData
   ) => {
-    if (user) {
-      const { pet_name, date, notes } = formData;
-      if (date === null) {
-        setError('date', { message: 'Datos parinkimo problema' });
-        return;
-      }
-      const user_id = user.id;
-      try {
-        const res = await AppointmentService.newAppointment(
-          pet_name,
-          date,
-          notes,
-          +user_id
-        );
-        dispatch(addAppointment(res.data));
-        toast.success('Vizitas sėkmingai užregistruotas!');
-        reset();
-      } catch (e: unknown) {
-        setError('root', { message: HelperService.errorToString(e) });
-      }
+    const { pet_name, date, notes } = formData;
+
+    if (date === null) {
+      setError('date', { message: 'Datos parinkimo problema' });
+      return;
+    }
+    try {
+      await AppointmentService.updateAppointment(item.id, {
+        pet_name: pet_name,
+        date: date,
+        notes: notes,
+      });
+      dispatch(
+        updateAppointment({
+          id: item.id,
+          pet_name: pet_name,
+          date: new Date(),
+          notes: notes,
+        })
+      );
+      toast.success('Vizitas sėkmingai atnaujintas!');
+      reset();
+      onClose();
+    } catch (e: unknown) {
+      setError('root', { message: HelperService.errorToString(e) });
     }
   };
 
@@ -109,6 +123,7 @@ export const AppointmentForm = () => {
               name="date"
               render={({ field }) => (
                 <DatePicker
+                  id="date"
                   locale={lt}
                   selected={field.value}
                   showTimeSelect
@@ -144,11 +159,20 @@ export const AppointmentForm = () => {
           {errors.pet_name && <span>{errors.pet_name.message}</span>}
           {errors.date && <span>{errors.date.message}</span>}
         </div>
-        <div className="col-span-2">
-          <button className="btn-generic my-3" type="submit">
-            Užregistruoti
-          </button>
-        </div>
+      </div>
+      <div className="flex gap-3">
+        <button
+          type="submit"
+          className="min-w-[200px] border border-emerald-300 bg-slate-200 rounded-lg py-1 px-2 hover:bg-slate-300"
+        >
+          Taip
+        </button>
+        <button
+          onClick={onClose}
+          className="min-w-[200px] border border-rose-300 bg-slate-200 rounded-lg py-1 px-2 hover:bg-slate-300"
+        >
+          Ne
+        </button>
       </div>
     </form>
   );

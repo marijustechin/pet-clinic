@@ -30,9 +30,19 @@ export default class AppointmentService {
     return await $api.delete<string>(`/appointment/${appointmentId}`);
   }
 
+  static async getAppointmentById(appointmentId: string) {
+    return await $api.get<IAppointment>(`/appointment/edit/${appointmentId}`);
+  }
+
   static async updateAppointment(
     appointmentId: string,
-    updateData: { rating?: number; status?: string }
+    updateData: {
+      rating?: number;
+      status?: string;
+      pet_name?: string;
+      date?: Date;
+      notes?: string;
+    }
   ) {
     return await $api.patch(`/appointment/${appointmentId}`, updateData);
   }

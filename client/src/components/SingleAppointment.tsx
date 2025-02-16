@@ -10,6 +10,8 @@ import { IAppointment } from '../types/appointment';
 import { IUser } from '../types/user';
 import { ConfirmModal } from './ConfirmModal';
 import { RatingMain } from './rating/RatingMain';
+import { EditAppointmentModal } from './EditAppointmentModal';
+import { Link } from 'react-router';
 
 interface SingleAppointmentProps {
   item: IAppointment;
@@ -19,6 +21,7 @@ interface SingleAppointmentProps {
 export const SingleAppointment = ({ item, user }: SingleAppointmentProps) => {
   const dispatch = useAppDispatch();
   const [confirm, setConfirm] = useState(false);
+  const [editModal, setEditModal] = useState(false);
 
   const handleDelete = async (yes: boolean) => {
     if (yes) {
@@ -50,6 +53,8 @@ export const SingleAppointment = ({ item, user }: SingleAppointmentProps) => {
     }
   };
 
+  const handleEditModal = () => {};
+
   return (
     <div className="flex gap-3 justify-between">
       <div className="flex flex-col gap-1">
@@ -60,7 +65,7 @@ export const SingleAppointment = ({ item, user }: SingleAppointmentProps) => {
           ❌
         </div>
         <div
-          onClick={() => {}}
+          onClick={() => setEditModal(true)}
           className="w-8 h-8 border border-violet-300 hover:bg-violet-200 rounded-md flex items-center justify-center cursor-pointer"
         >
           ✍️
@@ -100,6 +105,7 @@ export const SingleAppointment = ({ item, user }: SingleAppointmentProps) => {
           />
         </div>
       </div>
+      <EditAppointmentModal open={editModal} item={item} onClose={() => {}} />
       <ConfirmModal
         open={confirm}
         onAnswer={(answer) => handleDelete(answer)}

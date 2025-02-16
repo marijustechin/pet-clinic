@@ -84,6 +84,19 @@ class AppointmentService {
     return deleted;
   }
 
+  async getAppointmentById(id) {
+    const item = await appointment.findOne({
+      where: { id },
+      include: {
+        model: user,
+        as: 'user',
+        attributes: ['first_name'],
+      },
+    });
+    console.log(item);
+    return new appointmentDto(item);
+  }
+
   async updateAppointment(id, updateData) {
     const updated = await appointment.update(updateData, {
       where: { id },

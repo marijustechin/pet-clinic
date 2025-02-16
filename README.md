@@ -1,3 +1,5 @@
+#Užduotis
+
 Sukurkite gyvūnų registracijos pas gydytoją sistemą. Turi veikti FRONT ir BACK dalys.
 Funkcionalumas:
 Sistemoje turėtų būti dviejų tipų vartotojai registruoti klinikos pacientai ir administratorius.
@@ -11,3 +13,15 @@ Užkrovus puslapį turi būti rodoma signup arba login forma.
 6. Administratorius gali matyti, patvirtinti visų pacientų registracijas, taip pat ištrinti ir
    pakoreguoti registracijų duomenis.
 7. Minimalus, bet tvarkingas UI
+
+#Sprendimas
+
+Frontend:
+
+1. React + Vite + Tailwindcss
+2. zod, react-hook-form, redux, react-router
+
+Backend:
+
+1. Nodejs + express + express-validator
+2. cors, jsonwebtoken, dotenv, sequelize, cookies

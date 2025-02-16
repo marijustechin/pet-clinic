@@ -1,16 +1,16 @@
-import { FaMinus, FaPlus } from "react-icons/fa";
-import { useAppDispatch, useAppSelector } from "../store/store";
-import { selectUser } from "../store/users/usersSlice";
-import { AppointmentForm } from "../components/AppointmentForm";
-import { AppointmentListFilter } from "../components/AppointmentListFilter";
-import { AppointmentList } from "../components/AppointmentList";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { FaMinus, FaPlus } from 'react-icons/fa';
+import { useAppDispatch, useAppSelector } from '../store/store';
+import { selectUser } from '../store/users/usersSlice';
+import { AppointmentForm } from '../components/AppointmentForm';
+import { AppointmentListFilter } from '../components/AppointmentListFilter';
+import { AppointmentList } from '../components/AppointmentList';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import {
   getAppointmentsByUserId,
   selectAppointments,
-} from "../store/appointments/appointmentsSlice";
-import { Pagination } from "../components/Pagination";
+} from '../store/appointments/appointmentsSlice';
+import { Pagination } from '../components/Pagination';
 
 export const UserPage = () => {
   const dispatch = useAppDispatch();
@@ -21,9 +21,9 @@ export const UserPage = () => {
 
   useEffect(() => {
     if (!user) {
-      navigate("/");
-    } else if (user.role === "ADMIN") {
-      navigate("/administratorius");
+      navigate('/');
+    } else if (user.role === 'ADMIN') {
+      navigate('/administratorius');
     }
   }, [user, navigate]);
 

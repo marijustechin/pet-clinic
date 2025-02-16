@@ -1,8 +1,8 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "../store";
-import AppointmentService from "../../services/AppointmentService";
-import { IAppointment, IAppointmentsPaginated } from "../../types/appointment";
-import HelperService from "../../services/HelperService";
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RootState } from '../store';
+import AppointmentService from '../../services/AppointmentService';
+import { IAppointment, IAppointmentsPaginated } from '../../types/appointment';
+import HelperService from '../../services/HelperService';
 
 interface IUserId {
   id: string;
@@ -23,19 +23,19 @@ interface IInitState {
 
 const initialState: IInitState = {
   items: [],
-  status: "idle",
+  status: 'idle',
   error: undefined,
   currentPage: 1,
   perPage: 3,
   total: 0,
   sort: {
-    opt1: "date",
-    opt2: "asc",
+    opt1: 'date',
+    opt2: 'asc',
   },
 };
 
 export const deleteAppointment = createAsyncThunk<string, IUserId>(
-  "appointments/deleteAppointment",
+  'appointments/deleteAppointment',
   async ({ id }, { rejectWithValue }) => {
     try {
       const res = await AppointmentService.deleteAppointment(id);
@@ -50,12 +50,12 @@ export const getAppointments = createAsyncThunk<
   IAppointmentsPaginated,
   void,
   { state: RootState }
->("appointments/getAppointments", async (_, { getState, rejectWithValue }) => {
+>('appointments/getAppointments', async (_, { getState, rejectWithValue }) => {
   try {
     const state = getState();
     const currentPage = state.appointments.currentPage;
     const perPage = state.appointments.perPage;
-    const query = "?page=" + currentPage + "&per_page=" + perPage;
+    const query = '?page=' + currentPage + '&per_page=' + perPage;
 
     const res = await AppointmentService.getAllAppointments(query);
 
@@ -70,13 +70,13 @@ export const getAppointmentsByUserId = createAsyncThunk<
   IUserId,
   { state: RootState }
 >(
-  "appointments/getAppointmentsByUserId",
+  'appointments/getAppointmentsByUserId',
   async ({ id }, { getState, rejectWithValue }) => {
     try {
       const state = getState();
       const currentPage = state.appointments.currentPage;
       const perPage = state.appointments.perPage;
-      const query = "?page=" + currentPage + "&per_page=" + perPage;
+      const query = '?page=' + currentPage + '&per_page=' + perPage;
       const res = await AppointmentService.getUserAppointments(id, query);
 
       return res.data;
@@ -87,7 +87,7 @@ export const getAppointmentsByUserId = createAsyncThunk<
 );
 
 export const appointmentSlice = createSlice({
-  name: "appointments",
+  name: 'appointments',
   initialState,
   reducers: {
     addAppointment: (state, action) => {
@@ -114,21 +114,42 @@ export const appointmentSlice = createSlice({
         ...state.items.filter((item) => item.id !== action.payload),
       ];
     },
+    updateAppointment: (
+      state,
+      action: PayloadAction<{
+        id: string;
+        pet_name: string;
+        date: Date;
+        notes: string;
+      }>
+    ) => {
+      const { id, pet_name, date, notes } = action.payload;
+      const update = state.items.find((item) => (item.id = id));
+      if (update) {
+        update.date = date;
+        update.pet_name = pet_name;
+        update.notes = notes;
+      }
+    },
     sortAppointments: (state, action) => {
       switch (action.payload) {
-        case "date":
+        case 'date':
           state.sort = { ...state.sort, opt1: action.payload };
           // rikiuojam pagal data
-          if (state.sort.opt2 === "asc") {
-            state.items.sort((a, b) => a.date.localeCompare(b.date));
+          if (state.sort.opt2 === 'asc') {
+            state.items.sort(
+              (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+            );
           } else {
-            state.items.sort((a, b) => b.date.localeCompare(a.date));
+            state.items.sort(
+              (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+            );
           }
           break;
-        case "owner":
+        case 'owner':
           state.sort = { ...state.sort, opt1: action.payload };
           // rikiuojam pagal savininka
-          if (state.sort.opt2 === "asc") {
+          if (state.sort.opt2 === 'asc') {
             state.items.sort((a, b) =>
               a.user.first_name.localeCompare(b.user.first_name)
             );
@@ -138,11 +159,29 @@ export const appointmentSlice = createSlice({
             );
           }
           break;
-        case "asc":
+        case 'asc':
           state.sort = { ...state.sort, opt2: action.payload };
+          if (state.sort.opt1 === 'owner') {
+            state.items.sort((a, b) =>
+              a.user.first_name.localeCompare(b.user.first_name)
+            );
+          } else {
+            state.items.sort(
+              (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+            );
+          }
           break;
-        case "desc":
+        case 'desc':
           state.sort = { ...state.sort, opt2: action.payload };
+          if (state.sort.opt1 === 'owner') {
+            state.items.sort((a, b) =>
+              b.user.first_name.localeCompare(a.user.first_name)
+            );
+          } else {
+            state.items.sort(
+              (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+            );
+          }
           break;
       }
     },
@@ -150,27 +189,27 @@ export const appointmentSlice = createSlice({
   extraReducers(builder) {
     builder
       .addCase(getAppointmentsByUserId.pending, (state) => {
-        state.status = "loading";
+        state.status = 'loading';
       })
       .addCase(getAppointmentsByUserId.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.status = 'succeeded';
         state.items = [...action.payload.items];
         state.total = action.payload.total;
       })
       .addCase(getAppointmentsByUserId.rejected, (state, action) => {
-        state.status = "failed";
+        state.status = 'failed';
         state.error = action.payload as string;
       })
       .addCase(getAppointments.pending, (state) => {
-        state.status = "loading";
+        state.status = 'loading';
       })
       .addCase(getAppointments.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.status = 'succeeded';
         state.items = [...action.payload.items];
         state.total = action.payload.total;
       })
       .addCase(getAppointments.rejected, (state, action) => {
-        state.status = "failed";
+        state.status = 'failed';
         state.error = action.payload as string;
       });
   },
@@ -183,6 +222,7 @@ export const {
   setCurrentPage,
   setPerPage,
   updateState,
+  updateAppointment,
 } = appointmentSlice.actions;
 
 export const selectAppointments = (state: RootState) =>
